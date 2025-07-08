@@ -58,26 +58,16 @@ function formatTimeLeft(ms: number): string {
     )}:${String(seconds).padStart(2, "0")}`;
 }
 
-function formatHour(date: Date) {
-    return date.toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-    });
-}
-
 export default function CyclicCountdownTimer({
     times,
 }: CyclicCountdownTimerProps) {
     const [timeLeft, setTimeLeft] = useState("");
-    const [brTime, setBrTime] = useState("");
-    const [localTime, setLocalTime] = useState("");
 
     useEffect(() => {
         let interval: NodeJS.Timeout;
 
         const update = () => {
-            const { brDate, localDate } = getNextTargetTime(times);
+            const { brDate } = getNextTargetTime(times);
             const now = new Date();
             const diff =
                 brDate.getTime() -
@@ -90,8 +80,6 @@ export default function CyclicCountdownTimer({
             }
 
             setTimeLeft(formatTimeLeft(diff));
-            setBrTime(formatHour(brDate));
-            setLocalTime(formatHour(localDate));
         };
 
         update();
