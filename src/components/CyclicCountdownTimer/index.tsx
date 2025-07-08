@@ -1,44 +1,49 @@
 import { useEffect, useState } from "react";
 
 interface CyclicCountdownTimerProps {
-    times: string[]; // Horários em horário de Brasília (ex: "14:55")
+    times: string[]; // Ex: ["14:55", "18:55", ...] - todos em horário de Brasília
 }
 
-const BR_TIMEZONE = "America/Sao_Paulo";
+const BR_TZ = "America/Sao_Paulo";
 
-function getNextTargetDate(timeStr: string): { brDate: Date; localDate: Date } {
-    const [hour, minute] = timeStr.split(":").map(Number);
-
+function getNextTargetTime(times: string[]): {
+    brDate: Date;
+    localDate: Date;
+    targetStr: string;
+} {
     const now = new Date();
 
-    // Data no fuso de Brasília (sem considerar a hora ainda)
-    const brDateString = new Intl.DateTimeFormat("en-CA", {
-        timeZone: BR_TIMEZONE,
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-    }).format(now); // YYYY-MM-DD
+    const nowInBR = new Date(now.toLocaleString("en-US", { timeZone: BR_TZ }));
 
-    // Concatena hora brasileira
-    const brDate = new Date(
-        `${brDateString}T${String(hour).padStart(2, "0")}:${String(
-            minute
-        ).padStart(2, "0")}:00-03:00`
-    );
+    for (let i = 0; i < times.length; i++) {
+        const [h, m] = times[i].split(":").map(Number);
 
-    // Se o horário já passou, adiciona um dia
-    if (brDate.getTime() <= now.getTime()) {
-        brDate.setDate(brDate.getDate() + 1);
+        const targetBR = new Date(nowInBR);
+        targetBR.setHours(h, m, 0, 0);
+
+        if (targetBR > nowInBR) {
+            const localDate = new Date(
+                targetBR.toLocaleString("en-US", {
+                    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                })
+            );
+            return { brDate: targetBR, localDate, targetStr: times[i] };
+        }
     }
 
-    return {
-        brDate,
-        localDate: new Date(
-            brDate.toLocaleString("en-US", {
-                timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-            })
-        ),
-    };
+    // Se todos passaram, pega o primeiro do dia seguinte
+    const [h, m] = times[0].split(":").map(Number);
+    const nextBR = new Date(nowInBR);
+    nextBR.setDate(nextBR.getDate() + 1);
+    nextBR.setHours(h, m, 0, 0);
+
+    const localDate = new Date(
+        nextBR.toLocaleString("en-US", {
+            timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+        })
+    );
+
+    return { brDate: nextBR, localDate, targetStr: times[0] };
 }
 
 function formatTimeLeft(ms: number): string {
@@ -53,35 +58,52 @@ function formatTimeLeft(ms: number): string {
     )}:${String(seconds).padStart(2, "0")}`;
 }
 
+function formatHour(date: Date) {
+    return date.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+    });
+}
+
 export default function CyclicCountdownTimer({
     times,
 }: CyclicCountdownTimerProps) {
-    const [currentIndex, setCurrentIndex] = useState(0);
     const [timeLeft, setTimeLeft] = useState("");
+    const [brTime, setBrTime] = useState("");
+    const [localTime, setLocalTime] = useState("");
 
     useEffect(() => {
+        let interval: NodeJS.Timeout;
+
         const update = () => {
-            const { brDate } = getNextTargetDate(times[currentIndex]);
+            const { brDate, localDate } = getNextTargetTime(times);
             const now = new Date();
-            const diff = brDate.getTime() - now.getTime();
+            const diff =
+                brDate.getTime() -
+                new Date(
+                    now.toLocaleString("en-US", { timeZone: BR_TZ })
+                ).getTime();
 
             if (diff <= 0) {
-                setCurrentIndex((prev) => (prev + 1) % times.length);
-                return;
+                return; // espera o próximo loop encontrar o próximo horário
             }
 
             setTimeLeft(formatTimeLeft(diff));
+            setBrTime(formatHour(brDate));
+            setLocalTime(formatHour(localDate));
         };
 
         update();
-        const interval = setInterval(update, 1000);
+        interval = setInterval(update, 1000);
+
         return () => clearInterval(interval);
-    }, [currentIndex, times]);
+    }, [times]);
 
     return (
-        <div className="text-base font-mono space-y-1 bg-green-400 px-4 py-2 rounded-md my-4 text-primary">
+        <div className="text-base font-mono space-y-1 bg-green-600 px-10 py-3 rounded-md my-2">
             <div>
-                ⏳ Time remaining to next bid: <strong>{timeLeft}</strong>
+                ⏳ Time to next auction: <strong>{timeLeft}</strong>
             </div>
         </div>
     );

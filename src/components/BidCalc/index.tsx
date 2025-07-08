@@ -58,7 +58,15 @@ export const BidCalc = () => {
         <div className="flex flex-col items-center justify-center min-h-screen bg-primary text-white ">
             <h1 className="text-3xl font-bold mb-1">Bid Calculator</h1>
             <CyclicCountdownTimer
-                times={["14:55", "18:55", "22:55", "02:55", "06:55", "10:55"]}
+                times={[
+                    "15:40",
+                    "18:55",
+                    "22:55",
+                    "02:55",
+                    "06:55",
+                    "10:55",
+                    "14:55",
+                ]}
             />
             <p className="text-lg mb-6 text-sub">
                 Calculate your bids efficiently!
