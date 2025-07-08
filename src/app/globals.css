@@ -4,6 +4,7 @@
     --color-primary: #191919;
     --color-secondary: #27292d;
     --color-sub: #ccb587;
+    --color-side: #1c1c1e;
 }
 
 @layer utilities {
