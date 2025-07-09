@@ -1,98 +1,78 @@
-/* eslint-disable prefer-const */
 import { useEffect, useState } from "react";
 
-interface CyclicCountdownTimerProps {
-    times: string[]; // Ex: ["14:55", "18:55", ...] - todos em horário de Brasília
-}
+const BRAZIL_TIMES = ["02:55", "06:55", "10:55", "14:55", "18:55", "22:55"];
+const BRAZIL_TIMEZONE = "America/Sao_Paulo";
 
-const BR_TZ = "America/Sao_Paulo";
-
-function getNextTargetTime(times: string[]): {
-    brDate: Date;
-    localDate: Date;
-    targetStr: string;
-} {
+function getNextAuctionTime() {
     const now = new Date();
+    const nowInBR = new Date(
+        now.toLocaleString("en-US", { timeZone: BRAZIL_TIMEZONE })
+    );
 
-    const nowInBR = new Date(now.toLocaleString("en-US", { timeZone: BR_TZ }));
+    for (const time of BRAZIL_TIMES) {
+        const [hour, minute] = time.split(":").map(Number);
+        const candidate = new Date(nowInBR);
+        candidate.setHours(hour, minute, 0, 0);
 
-    for (let i = 0; i < times.length; i++) {
-        const [h, m] = times[i].split(":").map(Number);
-
-        const targetBR = new Date(nowInBR);
-        targetBR.setHours(h, m, 0, 0);
-
-        if (targetBR > nowInBR) {
-            const localDate = new Date(
-                targetBR.toLocaleString("en-US", {
+        if (candidate > nowInBR) {
+            return new Date(
+                candidate.toLocaleString("en-US", {
                     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 })
             );
-            return { brDate: targetBR, localDate, targetStr: times[i] };
         }
     }
 
-    // Se todos passaram, pega o primeiro do dia seguinte
-    const [h, m] = times[0].split(":").map(Number);
-    const nextBR = new Date(nowInBR);
-    nextBR.setDate(nextBR.getDate() + 1);
-    nextBR.setHours(h, m, 0, 0);
+    // Nenhum horário restante hoje, retorna o primeiro horário do dia seguinte
+    const [hour, minute] = BRAZIL_TIMES[0].split(":").map(Number);
+    const next = new Date(nowInBR);
+    next.setDate(next.getDate() + 1);
+    next.setHours(hour, minute, 0, 0);
 
-    const localDate = new Date(
-        nextBR.toLocaleString("en-US", {
+    return new Date(
+        next.toLocaleString("en-US", {
             timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         })
     );
-
-    return { brDate: nextBR, localDate, targetStr: times[0] };
 }
 
 function formatTimeLeft(ms: number): string {
-    const totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
+    const total = Math.floor(ms / 1000);
+    const h = Math.floor(total / 3600);
+    const m = Math.floor((total % 3600) / 60);
+    const s = total % 60;
+    return `${String(h).padStart(2, "0")}:${String(m).padStart(
         2,
         "0"
-    )}:${String(seconds).padStart(2, "0")}`;
+    )}:${String(s).padStart(2, "0")}`;
 }
 
-export default function CyclicCountdownTimer({
-    times,
-}: CyclicCountdownTimerProps) {
+export default function AuctionCountdown() {
+    const [targetDate, setTargetDate] = useState(getNextAuctionTime());
     const [timeLeft, setTimeLeft] = useState("");
 
     useEffect(() => {
-        let interval: NodeJS.Timeout;
-
-        const update = () => {
-            const { brDate } = getNextTargetTime(times);
+        const interval = setInterval(() => {
             const now = new Date();
-            const diff =
-                brDate.getTime() -
-                new Date(
-                    now.toLocaleString("en-US", { timeZone: BR_TZ })
-                ).getTime();
+            const diff = targetDate.getTime() - now.getTime();
 
             if (diff <= 0) {
-                return; // espera o próximo loop encontrar o próximo horário
+                const newTarget = getNextAuctionTime();
+                setTargetDate(newTarget);
+                return;
             }
 
             setTimeLeft(formatTimeLeft(diff));
-        };
-
-        update();
-        interval = setInterval(update, 1000);
+        }, 1000);
 
         return () => clearInterval(interval);
-    }, [times]);
+    }, [targetDate]);
 
     return (
-        <div className="text-base font-mono space-y-1 bg-green-600 px-10 py-3 rounded-md my-2">
+        <div className="text-base font-mono space-y-1 bg-green-600 px-8 py-2 rounded-md my-2">
             <div>
-                ⏳ Time to next auction: <strong>{timeLeft}</strong>
+                ⏳ Time to next auction:{" "}
+                <strong className="text-xl">{timeLeft}</strong>
             </div>
         </div>
     );

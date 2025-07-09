@@ -57,17 +57,7 @@ export const BidCalc = () => {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-primary text-white ">
             <h1 className="text-3xl font-bold mb-1">Bid Calculator</h1>
-            <CyclicCountdownTimer
-                times={[
-                    "15:40",
-                    "18:55",
-                    "22:55",
-                    "02:55",
-                    "06:55",
-                    "10:55",
-                    "14:55",
-                ]}
-            />
+            <CyclicCountdownTimer />
             <p className="text-lg mb-6 text-sub">
                 Calculate your bids efficiently!
             </p>
@@ -140,8 +130,7 @@ export const BidCalc = () => {
                 </div>
                 <div className="flex gap-2 items-center justify-start">
                     <label className="text-sm">
-                        Captain Bonus{" "}
-                        <span className="text-green-400">(10%)</span>
+                        Captain Bonus <span className="text-sub">(10%)</span>
                     </label>
                     <div className="flex justify-between w-[350px] px-2 ">
                         <div
@@ -210,7 +199,7 @@ export const BidCalc = () => {
                                 }
                             }}
                         >
-                            Task 1 <span className="text-green-400">(2%)</span>
+                            Task 1 <span className="text-sub">(2%)</span>
                             <div
                                 className={`w-5 h-5 border-2 rounded-sm flex items-center justify-center transition-colors duration-200 ${
                                     gonzos.second.t1
@@ -268,7 +257,7 @@ export const BidCalc = () => {
                                 }
                             }}
                         >
-                            Task 2 <span className="text-green-400">(3%)</span>
+                            Task 2 <span className="text-sub">(3%)</span>
                             <div
                                 className={`w-5 h-5 border-2 rounded-sm flex items-center justify-center transition-colors duration-200 ${
                                     gonzos.second.t2
@@ -325,7 +314,7 @@ export const BidCalc = () => {
                                 }
                             }}
                         >
-                            Task 1 <span className="text-green-400">(6%)</span>
+                            Task 1 <span className="text-sub">(6%)</span>
                             <div
                                 className={`w-5 h-5 border-2 rounded-sm flex items-center justify-center transition-colors duration-200 ${
                                     gonzos.thirth
@@ -382,7 +371,7 @@ export const BidCalc = () => {
                                 }
                             }}
                         >
-                            Task 1 <span className="text-green-400">(8%)</span>
+                            Task 1 <span className="text-sub">(8%)</span>
                             <div
                                 className={`w-5 h-5 border-2 rounded-sm flex items-center justify-center transition-colors duration-200 ${
                                     gonzos.fourth
@@ -445,7 +434,7 @@ export const BidCalc = () => {
                                 }
                             }}
                         >
-                            Task 1 <span className="text-green-400">(2%)</span>
+                            Task 1 <span className="text-sub">(2%)</span>
                             <div
                                 className={`w-5 h-5 border-2 rounded-sm flex items-center justify-center transition-colors duration-200 ${
                                     gonzos.fifith.t1
@@ -503,7 +492,7 @@ export const BidCalc = () => {
                                 }
                             }}
                         >
-                            Task 2<span className="text-green-400">(3%)</span>
+                            Task 2<span className="text-sub">(3%)</span>
                             <div
                                 className={`w-5 h-5 border-2 rounded-sm flex items-center justify-center transition-colors duration-200 ${
                                     gonzos.fifith.t2
@@ -542,7 +531,7 @@ export const BidCalc = () => {
                 <div className="flex gap-2 items-center justify-start">
                     <label className="text-sm">
                         Dealer Class Part 3{" "}
-                        <span className="text-green-400">(3%)</span>
+                        <span className="text-sub">(3%)</span>
                     </label>
                     <div className="flex justify-start gap-4 w-[350px] px-2 ">
                         <div
