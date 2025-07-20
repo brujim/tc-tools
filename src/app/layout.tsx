@@ -25,6 +25,11 @@ export default function RootLayout({
                     name="google-adsense-account"
                     content="ca-pub-7164529681401190"
                 />
+                <script
+                    async
+                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7164529681401190"
+                    crossOrigin="anonymous"
+                ></script>
             </head>
             <body className={`${roboto.className} antialiased bg-primary`}>
                 {children}
