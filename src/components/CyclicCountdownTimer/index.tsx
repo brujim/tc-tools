@@ -54,7 +54,7 @@ export default function AuctionCountdown() {
 
     useEffect(() => {
         if (!audioRef.current) {
-            audioRef.current = new Audio("/alert.mp3"); // Coloque alert.mp3 em /public
+            audioRef.current = new Audio("/alert.mp3");
         }
 
         const interval = setInterval(() => {
