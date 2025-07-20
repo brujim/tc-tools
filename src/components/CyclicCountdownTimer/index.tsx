@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const BRAZIL_TIMES = ["02:55", "06:55", "10:55", "14:55", "18:55", "22:55"];
 const BRAZIL_TIMEZONE = "America/Sao_Paulo";
@@ -23,7 +23,6 @@ function getNextAuctionTime() {
         }
     }
 
-    // Nenhum horário restante hoje, retorna o primeiro horário do dia seguinte
     const [hour, minute] = BRAZIL_TIMES[0].split(":").map(Number);
     const next = new Date(nowInBR);
     next.setDate(next.getDate() + 1);
@@ -50,16 +49,27 @@ function formatTimeLeft(ms: number): string {
 export default function AuctionCountdown() {
     const [targetDate, setTargetDate] = useState(getNextAuctionTime());
     const [timeLeft, setTimeLeft] = useState("");
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const alarmPlayedRef = useRef(false);
 
     useEffect(() => {
+        if (!audioRef.current) {
+            audioRef.current = new Audio("/alert.mp3"); // Coloque alert.mp3 em /public
+        }
+
         const interval = setInterval(() => {
             const now = new Date();
             const diff = targetDate.getTime() - now.getTime();
 
             if (diff <= 0) {
-                const newTarget = getNextAuctionTime();
-                setTargetDate(newTarget);
+                setTargetDate(getNextAuctionTime());
+                alarmPlayedRef.current = false;
                 return;
+            }
+
+            if (diff <= 1 * 60 * 1000 && !alarmPlayedRef.current) {
+                audioRef.current?.play().catch(() => null);
+                alarmPlayedRef.current = true;
             }
 
             setTimeLeft(formatTimeLeft(diff));
