@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 const BRAZIL_TIMES = ["02:55", "06:55", "10:55", "14:55", "18:55", "22:55"];
 const BRAZIL_TIMEZONE = "America/Sao_Paulo";
@@ -49,37 +49,52 @@ function formatTimeLeft(ms: number): string {
 export default function AuctionCountdown() {
     const [targetDate, setTargetDate] = useState(getNextAuctionTime());
     const [timeLeft, setTimeLeft] = useState("");
-    const audioRef = useRef<HTMLAudioElement | null>(null);
-    const alarmPlayedRef = useRef(false);
 
     useEffect(() => {
-        if (!audioRef.current) {
-            audioRef.current = new Audio("/alert.mp3");
-        }
+        const audio1MinRef = new Audio("/alert.mp3");
+
+        const secondAudioMap: Record<number, HTMLAudioElement> = {
+            17: new Audio("/sound17.mp3"),
+            14: new Audio("/sound14.mp3"),
+            11: new Audio("/sound11.mp3"),
+            8: new Audio("/sound8.mp3"),
+            5: new Audio("/sound5.mp3"),
+            2: new Audio("/sound2.mp3"),
+        };
+
+        const playedSeconds = new Set<number>();
+        let oneMinutePlayed = false;
 
         const interval = setInterval(() => {
             const now = new Date();
-            const diff = targetDate.getTime() - now.getTime();
+            const diffMs = targetDate.getTime() - now.getTime();
+            const diffSec = Math.floor(diffMs / 1000);
 
-            if (diff <= 0) {
+            if (diffMs <= 0) {
                 setTargetDate(getNextAuctionTime());
-                alarmPlayedRef.current = false;
+                playedSeconds.clear();
+                oneMinutePlayed = false;
                 return;
             }
 
-            if (diff <= 1 * 60 * 1000 && !alarmPlayedRef.current) {
-                audioRef.current?.play().catch(() => null);
-                alarmPlayedRef.current = true;
+            if (diffSec <= 60 && !oneMinutePlayed) {
+                audio1MinRef.play().catch(() => null);
+                oneMinutePlayed = true;
             }
 
-            setTimeLeft(formatTimeLeft(diff));
+            if (secondAudioMap[diffSec] && !playedSeconds.has(diffSec)) {
+                secondAudioMap[diffSec].play().catch(() => null);
+                playedSeconds.add(diffSec);
+            }
+
+            setTimeLeft(formatTimeLeft(diffMs));
         }, 1000);
 
         return () => clearInterval(interval);
     }, [targetDate]);
 
     return (
-        <div className="text-base font-mono space-y-1 bg-green-600 px-8 py-2 rounded-md my-2">
+        <div className="text-base font-mono space-y-1 bg-green-600 px-8 py-2 rounded-md mb-2  text-center">
             <div>
                 ⏳ Time to next auction:{" "}
                 <strong className="text-xl">{timeLeft}</strong>
