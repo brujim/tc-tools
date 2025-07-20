@@ -5,7 +5,7 @@ export const University = () => {
     const closeModal = () => setGameClass("");
 
     return (
-        <div className="mt-8">
+        <div className="mt-10">
             <div className="flex justify-center items-center px-10 flex-wrap gap-5">
                 <div
                     className="bg-secondary w-[170px] h-[170px] rounded-lg border-2 border-sub flex flex-col items-center justify-center gap-2 hover:bg-white/20 cursor-pointer"

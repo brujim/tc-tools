@@ -65,7 +65,7 @@ export const BidCalc = () => {
     const closeModal = () => setModalOpen(false);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-primary text-white px-4 sm:px-8">
+        <div className="flex flex-col items-center  min-h-screen bg-primary text-white px-4 sm:px-8 mt-10">
             <CyclicCountdownTimer />
             <p className="text-lg mb-6 text-sub text-center">
                 Calculate your bids efficiently!

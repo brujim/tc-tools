@@ -94,7 +94,7 @@ export default function AuctionCountdown() {
     }, [targetDate]);
 
     return (
-        <div className="text-base font-mono space-y-1 bg-green-600 px-8 py-2 rounded-md mb-2  text-center">
+        <div className="text-base font-mono space-y-1 bg-green-600 px-8 py-2 rounded-md mb-2 text-center">
             <div>
                 ⏳ Time to next auction:{" "}
                 <strong className="text-xl">{timeLeft}</strong>
